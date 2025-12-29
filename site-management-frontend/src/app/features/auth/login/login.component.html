@@ -1,0 +1,181 @@
+<!-- source:https://codepen.io/owaiswiz/pen/jOPvEPB -->
+<div class="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
+    <div class="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+        <div class="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+            <!-- Language Toggle -->
+            <div class="flex justify-end mb-4">
+                <app-language-toggle></app-language-toggle>
+            </div>
+            
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-2">
+                    <span class="text-red-800">A</span><span class="text-gray-600">LTEA</span>
+                </h1>
+                <p class="text-gray-600 text-lg">
+                    Welcome to <span class="text-cyan-400">Hrimthurs</span><span class="text-gray-900 font-bold">Hub</span>
+                </p>
+            </div>
+            <div class="mt-12 flex flex-col items-center">
+                <div class="w-full flex-1 mt-8">
+                    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mx-auto max-w-xs">
+                        <input
+                            formControlName="email"
+                            class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                            type="email" [placeholder]="'EMAIL' | translate" />
+                        
+                        <input
+                            formControlName="password"
+                            class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                            type="password" [placeholder]="'PASSWORD' | translate" />
+
+                        <!-- Remember Email Checkbox -->
+                        <div class="flex items-center mt-4">
+                            <input
+                                aria-label="Remember email"
+                                type="checkbox"
+                                formControlName="rememberEmail"
+                                id="rememberEmail"
+                                class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded" />
+                            <label for="rememberEmail" class="ml-2 block text-sm text-gray-600">
+                                {{ 'REMEMBER_EMAIL' | translate }}
+                            </label>
+                        </div>
+                        
+                        <button
+                            type="submit"
+                            [disabled]="loginForm.invalid || isLoading"
+                            class="mt-5 tracking-wide font-semibold bg-emerald-600 text-white w-full py-4 rounded-lg hover:bg-emerald-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none disabled:opacity-50">
+                            <svg *ngIf="!isLoading" class="w-6 h-6 -ml-2" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                                <polyline points="10,17 15,12 10,7" />
+                                <line x1="15" y1="12" x2="3" y2="12" />
+                            </svg>
+                            <div *ngIf="isLoading" class="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent -ml-2"></div>
+                            <span class="ml-3">
+                                {{ isLoading ? ('SIGNING_IN' | translate) : ('SIGN_IN' | translate) }}
+                            </span>
+                        </button>
+
+                        <!-- Forgot Password Link -->
+                        <div class="mt-4 text-center">
+                            <a routerLink="/forgot-password" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+                                {{ 'FORGOT_PASSWORD_LINK' | translate }}
+                            </a>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div *ngIf="errorMessage" class="mt-4 text-red-600 text-sm text-center">
+                            {{ errorMessage }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="flex-1 bg-emerald-50 text-center hidden lg:flex">
+            <div class="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
+                style="background-image: url('images/background.svg');">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LOGIN SUCCESS MODAL -->
+<div *ngIf="showSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+    <div class="bg-white p-10 rounded-2xl text-center max-w-md mx-4 shadow-2xl border border-gray-200">
+        <!-- Success Icon -->
+        <div class="w-20 h-20 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-pulse">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        
+        <!-- Success Title -->
+        <h2 class="text-gray-900 text-3xl font-bold mb-4">
+            {{ 'LOGIN_SUCCESSFUL' | translate }}
+        </h2>
+        
+        <!-- Success Message -->
+        <p class="text-gray-600 mb-4 text-lg leading-relaxed">
+            {{ 'LOGIN_WELCOME_MESSAGE' | translate }}
+        </p>
+        
+        <!-- Auto-redirect notice -->
+        <p class="text-sm text-gray-500 mb-6">
+            Redirecting automatically in 5 seconds...
+        </p>
+        
+        <!-- Continue Button -->
+        <button 
+            (click)="onSuccessModalClose()"
+            class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 px-8 rounded-lg font-semibold text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-300 shadow-lg animate-bounce">
+            Continue Now
+        </button>
+    </div>
+</div>
+
+<!-- LOGIN FAILED MODAL -->
+<div *ngIf="showFailedModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] backdrop-blur-sm">
+    <div class="bg-white p-10 rounded-2xl text-center max-w-md mx-4 shadow-2xl border-2" 
+         [ngClass]="{
+           'border-red-200': errorType === 'login',
+           'border-amber-200': errorType === 'server',
+           'border-blue-200': errorType === 'network'
+         }">
+        
+        <!-- Error Icon -->
+        <div class="mx-auto mb-6">
+            <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01" />
+            </svg>
+        </div> 
+        
+        <!-- Error Title with dynamic text -->
+        <h2 class="text-gray-900 text-3xl font-bold mb-4">
+            <span *ngIf="errorType === 'login'">{{ 'INVALID_CREDENTIALS' | translate }}</span>
+            <span *ngIf="errorType === 'server'">{{ 'SERVER_ERROR' | translate }}</span>
+            <span *ngIf="errorType === 'network'">{{ 'CONNECTION_ERROR' | translate }}</span>
+            <span *ngIf="!errorType">{{ 'LOGIN_FAILED' | translate }}</span>
+        </h2>
+        
+        <!-- Error Message -->
+        <p class="text-gray-600 mb-6 text-lg leading-relaxed">
+            {{ errorMessage }}
+        </p>
+        
+        <!-- Additional help text based on error type -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <p class="text-sm text-gray-600">
+                <span *ngIf="errorType === 'login'">{{ 'TIP_CHECK_CREDENTIALS' | translate }}</span>
+                <span *ngIf="errorType === 'server'">{{ 'NOTICE_SERVER_ISSUES' | translate }}</span>
+                <span *ngIf="errorType === 'network'">{{ 'NOTE_CHECK_CONNECTION' | translate }}</span>
+                <span *ngIf="!errorType">{{ 'INFO_CONTACT_SUPPORT' | translate }}</span>
+            </p>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col gap-3" role="group" aria-label="Error actions">
+            <button 
+                (click)="onFailedModalClose()"
+                class="w-full py-4 px-8 rounded-lg font-semibold text-lg transition-all duration-300 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-200"
+                [ngClass]="{
+                  'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800': errorType === 'login',
+                  'bg-gradient-to-r from-amber-600 to-amber-700 text-white hover:from-amber-700 hover:to-amber-800': errorType === 'server',
+                  'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800': errorType === 'network',
+                  'bg-gradient-to-r from-gray-600 to-gray-700 text-white hover:from-gray-700 hover:to-gray-800': !errorType
+                }"
+                aria-label="Retry">
+                <span *ngIf="errorType === 'network'">{{ 'RETRY_CONNECTION' | translate }}</span>
+                <span *ngIf="errorType !== 'network'">{{ 'TRY_AGAIN' | translate }}</span>
+            </button>
+            
+            <button 
+                (click)="onFailedModalClose()"
+                class="w-full bg-transparent text-gray-600 py-2 px-6 rounded-lg font-medium hover:bg-gray-100 transition-all duration-300 text-sm"
+                aria-label="Cancel">
+                {{ 'CANCEL' | translate }}
+            </button>
+        </div>
+    </div>
+</div>
+

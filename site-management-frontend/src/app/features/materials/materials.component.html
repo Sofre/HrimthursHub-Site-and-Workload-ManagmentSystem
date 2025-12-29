@@ -1,0 +1,198 @@
+<div class="materials-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">←</button>
+      <div>
+        <h1 class="page-title">Materials</h1>
+        <p class="page-subtitle">Inventory, low-stock alerts and quick stock actions</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="refresh-btn" (click)="loadMaterials()">Refresh</button>
+    </div>
+  </div>
+
+  <div class="materials-body">
+    <div class="materials-panel">
+      <div class="controls">
+        <div class="search-box">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" placeholder="Search materials by name, type, or site..." [(ngModel)]="searchTerm" (input)="onSearch()" />
+        </div>
+        <div style="display:flex; gap:8px; align-items:center">
+          <button class="refresh-btn" (click)="filterLowStock()">Low stock</button>
+        </div>
+      </div>
+
+      <div class="stats-cards" *ngIf="stats">
+        <div class="stat-card">
+          <div class="stat-label">Total materials</div>
+          <div class="stat-value">{{ stats.total }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low stock</div>
+          <div class="stat-value">{{ stats.lowStock }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Out of stock</div>
+          <div class="stat-value">{{ stats.outOfStock }}</div>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+              <th>Site</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let m of filteredMaterials">
+              <tr (click)="toggleDetails(m.material_id)" class="material-row">
+                <td>
+                  <div class="material-name-cell">
+                    <span class="expand-icon" [class.expanded]="expandedMaterialId === m.material_id">▶</span>
+                    <strong>{{ m.name }}</strong>
+                  </div>
+                </td>
+                <td>{{ m.quantity }}</td>
+                <td>{{ m.unit || '-' }}</td>
+                <td>{{ m.sites?.site_name || '-' }}</td>
+                <td (click)="$event.stopPropagation()">
+                  <button class="action-btn" (click)="addStock(m)">+ Stock</button>
+                  <button class="action-btn" (click)="useMaterial(m)">Use</button>
+                  <button class="action-btn" (click)="editMaterial(m)">Edit</button>
+                  <button class="action-btn" (click)="deleteMaterial(m)">Del</button>
+                </td>
+              </tr>
+              <tr *ngIf="expandedMaterialId === m.material_id" class="details-row">
+                <td colspan="5">
+                  <div class="material-details-panel">
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <label>Material ID:</label>
+                        <span>{{ m.material_id }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>Description:</label>
+                        <span>{{ m.description || 'No description provided' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>Current Stock:</label>
+                        <span class="stock-value">{{ m.quantity }} {{ m.unit || 'units' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>Site:</label>
+                        <span>{{ m.sites?.site_name || 'Not assigned' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>Created:</label>
+                        <span>{{ m.created_at ? (m.created_at | date:'short') : 'N/A' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <label>Last Updated:</label>
+                        <span>{{ m.updated_at ? (m.updated_at | date:'short') : 'N/A' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+            <tr *ngIf="!filteredMaterials || filteredMaterials.length === 0">
+              <td colspan="5" class="no-data">No materials found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Stock Modal -->
+<div class="modal-overlay" *ngIf="showAddStockModal" (click)="closeModals()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Add Stock</h3>
+      <button class="close-btn" (click)="closeModals()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Material:</strong> {{ selectedMaterial?.name }}</p>
+      <p><strong>Current Stock:</strong> {{ selectedMaterial?.quantity }} {{ selectedMaterial?.unit || 'units' }}</p>
+      
+      <div class="form-group">
+        <label>Quantity to Add <span class="required">*</span></label>
+        <input type="number" [(ngModel)]="stockForm.quantity" min="1" placeholder="Enter quantity" />
+      </div>
+      
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <textarea [(ngModel)]="stockForm.description" placeholder="e.g., Supplier delivery, restocking..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModals()">Cancel</button>
+      <button class="btn-primary" (click)="confirmAddStock()" [disabled]="stockForm.quantity <= 0">Add Stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Use Stock Modal -->
+<div class="modal-overlay" *ngIf="showUseStockModal" (click)="closeModals()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Use Material</h3>
+      <button class="close-btn" (click)="closeModals()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Material:</strong> {{ selectedMaterial?.name }}</p>
+      <p><strong>Available:</strong> {{ selectedMaterial?.quantity }} {{ selectedMaterial?.unit || 'units' }}</p>
+      
+      <div class="form-group">
+        <label>Quantity to Use <span class="required">*</span></label>
+        <input type="number" [(ngModel)]="useForm.quantity" [max]="selectedMaterial?.quantity || 0" min="1" placeholder="Enter quantity" />
+      </div>
+      
+      <p class="warning" *ngIf="useForm.quantity > (selectedMaterial?.quantity || 0)"> Cannot use more than available stock!</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModals()">Cancel</button>
+      <button class="btn-primary" (click)="confirmUseStock()" [disabled]="useForm.quantity <= 0 || useForm.quantity > (selectedMaterial?.quantity || 0)">Use Material</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Material Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeModals()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Edit Material</h3>
+      <button class="close-btn" (click)="closeModals()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Material Name <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="editForm.name" placeholder="Material name" />
+      </div>
+      
+      <div class="form-group">
+        <label>Unit</label>
+        <input type="text" [(ngModel)]="editForm.unit" placeholder="e.g., kg, m, pieces" />
+      </div>
+      
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="editForm.description" placeholder="Material description..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModals()">Cancel</button>
+      <button class="btn-primary" (click)="confirmEdit()" [disabled]="!editForm.name.trim()">Save Changes</button>
+    </div>
+  </div>
+</div>

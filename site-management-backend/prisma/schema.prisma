@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model attendance_logs {
+  log_id         Int       @id @default(autoincrement())
+  employee_id    Int
+  site_id        Int
+  check_in_time  DateTime  @db.Timestamp(6)
+  check_out_time DateTime? @db.Timestamp(6)
+  status         String    @db.VarChar(20)
+  employees      employees @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  sites          sites     @relation(fields: [site_id], references: [site_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model employees {
+  employee_id                              Int                       @id @default(autoincrement())
+  first_name                               String                    @db.VarChar(100)
+  last_name                                String                    @db.VarChar(100)
+  email                                    String                    @unique @db.VarChar(100)
+  password                                 String                    @db.VarChar(255)
+  phone_number                             String?                   @db.VarChar(20)
+  role_id                                  Int
+  date_hired                               DateTime                  @db.Date
+  status                                   String                    @db.VarChar(20)
+  force_password_change                    Boolean                   @default(true)
+  created_at                               DateTime                  @default(now()) @db.Timestamp(6)
+  updated_at                               DateTime                  @updatedAt @db.Timestamp(6)
+  attendance_logs                          attendance_logs[]
+  device_tokens                            device_tokens[]
+  roles                                    roles                     @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+  for_labor                                for_labor[]
+  notification_preferences                 notification_preferences?
+  notifications                            notifications[]
+  warnings_warnings_resolved_byToemployees warnings[]                @relation("warnings_resolved_byToemployees")
+  warnings_warnings_employee_idToemployees warnings[]                @relation("warnings_employee_idToemployees")
+  warnings_warnings_issued_byToemployees   warnings[]                @relation("warnings_issued_byToemployees")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model for_labor {
+  for_labor_id     Int       @id @default(autoincrement())
+  payment_id       Int
+  employee_id      Int
+  site_id          Int
+  for_labor_amount Decimal   @db.Decimal(10, 2)
+  payment_date     DateTime  @db.Date
+  payment_type     String    @db.VarChar(20)
+  status           String    @db.VarChar(20)
+  employees        employees @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  payments         payments  @relation(fields: [payment_id], references: [payment_id], onDelete: NoAction, onUpdate: NoAction)
+  sites            sites     @relation(fields: [site_id], references: [site_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([payment_id, for_labor_amount], map: "idx_for_labor_payment_id_cover")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model for_material {
+  for_material_id     Int       @id @default(autoincrement())
+  payment_id          Int
+  material_id         Int
+  site_id             Int
+  for_material_amount Decimal   @db.Decimal(10, 2)
+  payment_date        DateTime  @db.Date
+  supplier_name       String    @db.VarChar(250)
+  status              String    @db.VarChar(20)
+  materials           materials @relation(fields: [material_id], references: [material_id], onDelete: NoAction, onUpdate: NoAction)
+  payments            payments  @relation(fields: [payment_id], references: [payment_id], onDelete: NoAction, onUpdate: NoAction)
+  sites               sites     @relation(fields: [site_id], references: [site_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([payment_id, for_material_amount], map: "idx_for_material_payment_id_cover")
+}
+
+model materials {
+  material_id    Int              @id @default(autoincrement())
+  name           String           @db.VarChar(100)
+  description    String?
+  quantity       Int
+  unit           String?          @db.VarChar(20)
+  site_id        Int?
+  for_material   for_material[]
+  sites          sites?           @relation(fields: [site_id], references: [site_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payments {
+  payment_id   Int            @id @default(autoincrement())
+  amount       Decimal        @db.Decimal(10, 2)
+  status       String         @db.VarChar(20)
+  site_id      Int
+  payment_date DateTime       @default(dbgenerated("CURRENT_DATE")) @db.Date
+  for_labor    for_labor[]
+  for_material for_material[]
+  sites        sites          @relation(fields: [site_id], references: [site_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model roles {
+  role_id     Int         @id @default(autoincrement())
+  role_name   String      @unique @db.VarChar(50)
+  description String?
+  employees   employees[]
+  wage_rates  wage_rates?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model sites {
+  site_id         Int               @id @default(autoincrement())
+  site_name       String            @db.VarChar(100)
+  address         String?           @db.VarChar(200)
+  latitude        Decimal?          @db.Decimal(10, 8)
+  longitude       Decimal?          @db.Decimal(11, 8)
+  start_date      DateTime          @db.Date
+  deadline        DateTime?         @db.Date
+  end_date        DateTime?         @db.Date
+  status          String            @db.VarChar(20)
+  money_spent     Decimal?          @default(0) @db.Decimal(12, 2)
+  attendance_logs attendance_logs[]
+  for_labor       for_labor[]
+  for_material    for_material[]
+  materials       materials[]
+  payments        payments[]
+  site_location   site_locations?
+  warnings        warnings[]
+}
+
+model wage_rates {
+  wage_rate_id   Int      @id @default(autoincrement())
+  role_id        Int      @unique
+  hourly_rate    Decimal  @db.Decimal(8, 2)
+  effective_date DateTime @db.Date
+  roles          roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model warnings {
+  warning_id                                Int        @id @default(autoincrement())
+  employee_id                               Int
+  issued_by                                 Int
+  site_id                                   Int
+  warning_date                              DateTime   @db.Date
+  description                               String?
+  acknowledged_date                         DateTime?  @db.Timestamp(6)
+  appeal_date                               DateTime?  @db.Timestamp(6)
+  appeal_reason                             String?
+  appeal_status                             String?    @db.VarChar(20)
+  appeal_resolved_date                      DateTime?  @db.Timestamp(6)
+  appeal_resolved_by                        Int?
+  appeal_resolution_notes                   String?
+  created_at                                DateTime   @default(now()) @db.Timestamp(6)
+  updated_at                                DateTime   @updatedAt @db.Timestamp(6)
+  employees_warnings_resolved_byToemployees employees? @relation("warnings_resolved_byToemployees", fields: [appeal_resolved_by], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  employees_warnings_employee_idToemployees employees  @relation("warnings_employee_idToemployees", fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  employees_warnings_issued_byToemployees   employees  @relation("warnings_issued_byToemployees", fields: [issued_by], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  sites                                     sites      @relation(fields: [site_id], references: [site_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model site_locations {
+  location_id       Int      @id @default(autoincrement())
+  site_id           Int      @unique
+  latitude          Decimal  @db.Decimal(10, 8)
+  longitude         Decimal  @db.Decimal(11, 8)
+  address           String   @db.VarChar(500)
+  formatted_address String?  @db.VarChar(500)
+  place_id          String?  @db.VarChar(255)
+  created_at        DateTime @default(now()) @db.Timestamp(6)
+  updated_at        DateTime @updatedAt @db.Timestamp(6)
+  sites             sites    @relation(fields: [site_id], references: [site_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model device_tokens {
+  token_id     Int       @id @default(autoincrement())
+  employee_id  Int
+  device_token String    @db.VarChar(255)
+  device_type  String    @db.VarChar(20)
+  is_active    Boolean   @default(true)
+  created_at   DateTime  @default(now()) @db.Timestamp(6)
+  updated_at   DateTime  @updatedAt @db.Timestamp(6)
+  employees    employees @relation(fields: [employee_id], references: [employee_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([employee_id, device_token])
+}
+
+model notifications {
+  notification_id Int        @id @default(autoincrement())
+  employee_id     Int?
+  title           String     @db.VarChar(255)
+  message         String
+  type            String     @db.VarChar(50)
+  data            Json?
+  is_read         Boolean    @default(false)
+  is_sent         Boolean    @default(false)
+  sent_at         DateTime?  @db.Timestamp(6)
+  created_at      DateTime   @default(now()) @db.Timestamp(6)
+  employees       employees? @relation(fields: [employee_id], references: [employee_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model notification_preferences {
+  preference_id  Int       @id @default(autoincrement())
+  employee_id    Int       @unique
+  push_enabled   Boolean   @default(true)
+  email_enabled  Boolean   @default(true)
+  warning_push   Boolean   @default(true)
+  payment_push   Boolean   @default(true)
+  deadline_push  Boolean   @default(true)
+  low_stock_push Boolean   @default(true)
+  check_in_push  Boolean   @default(false)
+  created_at     DateTime  @default(now()) @db.Timestamp(6)
+  updated_at     DateTime  @updatedAt @db.Timestamp(6)
+  employees      employees @relation(fields: [employee_id], references: [employee_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model background_jobs {
+  job_id        Int       @id @default(autoincrement())
+  job_type      String    @db.VarChar(100)
+  status        String    @db.VarChar(20)
+  data          Json?
+  result        Json?
+  error_message String?
+  scheduled_at  DateTime  @db.Timestamp(6)
+  started_at    DateTime? @db.Timestamp(6)
+  completed_at  DateTime? @db.Timestamp(6)
+  created_at    DateTime  @default(now()) @db.Timestamp(6)
+}
+
+model cache_entries {
+  cache_key   String   @id @db.VarChar(255)
+  cache_value Json
+  ttl         Int
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  expires_at  DateTime @db.Timestamp(6)
+}

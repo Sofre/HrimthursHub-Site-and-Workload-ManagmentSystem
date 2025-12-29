@@ -1,0 +1,21 @@
+# Database Migrations
+
+This directory contains Prisma database migrations for schema normalization and updates.
+
+## Migration Purpose
+These migrations were created to:
+- Normalize the database schema structure
+- Fix faulty schema updates from previous versions
+- Ensure data integrity and proper relationships
+
+## Key Changes
+- Restructured table relationships
+- Added proper foreign key constraints
+- Normalized redundant data fields
+- Fixed column types and constraints
+- Updated indexes for better performance
+
+## Migration Order
+Migrations are applied in chronological order based on timestamp prefixes.
+
+## Migrations for next is triggers in after testing /maybe

@@ -1,0 +1,78 @@
+<div class="payments-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">←</button>
+      <div>
+        <h1 class="page-title">Payments</h1>
+        <p class="page-subtitle">Manage site payments and exports</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="add-btn">Create Payment</button>
+      <button class="refresh-btn" (click)="loadPayments()">Refresh</button>
+    </div>
+  </div>
+
+  <div class="payments-body">
+    <div class="payments-chart">
+      <h3>Payments (last 6 months)</h3>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-label">Total (6 months)</div>
+          <div class="stat-value">{{ totalLast6 | currency }}</div>
+          <div class="stat-sub">From {{ months[0]?.label }} to {{ months[months.length-1]?.label }}</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Average / month</div>
+          <div class="stat-value">{{ avgLast6 | currency }}</div>
+          <div class="stat-sub">Calculated over {{ months.length }} months</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Highest month</div>
+          <div class="stat-value">{{ highestMonth?.total | currency }}</div>
+          <div class="stat-sub">{{ highestMonth?.label }}</div>
+        </div>
+      </div>
+
+      <div class="chart-wrapper" aria-hidden="false">
+        <canvas baseChart
+          [data]="barChartData"
+          [options]="barChartOptions"
+          [type]="barChartType"
+          width="600" height="220" style="width:100%; display:block">
+        </canvas>
+      </div>
+    </div>
+
+    <div class="payments-table">
+      <h3>Recent Payments</h3>
+      <div class="page-meta" style="margin-bottom:8px; color: #6b7280">{{ loading ? 'Loading payments...' : paymentsLoaded ? (payments.length + ' payments loaded') : (error || 'No payments loaded') }}</div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Site</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of payments">
+            <td>{{ p.payment_id }}</td>
+            <td>{{ p.amount | currency }}</td>
+            <td>{{ p.status }}</td>
+            <td>{{ p.sites?.site_name || '-' }}</td>
+            <td>{{ p.payment_date | date:'yyyy-MM-dd' }}</td>
+          </tr>
+          <tr *ngIf="!payments || payments.length === 0">
+            <td colspan="5">No payments found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
