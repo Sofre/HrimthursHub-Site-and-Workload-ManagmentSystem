@@ -1,4 +1,4 @@
-# 🏗️ ALTEA - Site Management System
+# 🏗️ HrimthursHub : Site and Workload Management System
 
 > **SUPER README**: Complete documentation for the entire ALTEA Construction Site Management Platform
 
