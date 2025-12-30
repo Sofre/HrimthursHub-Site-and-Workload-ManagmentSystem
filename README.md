@@ -1,6 +1,6 @@
 # 🏗️ HrimthursHub : Site and Workload Management System
 
-> **SUPER README**: Complete documentation for the entire ALTEA Construction Site Management Platform
+Altea is name of company for whom project is dedicated to long run 
 
 ---
 
@@ -25,7 +25,7 @@
 
 ## 🎯 Project Overview
 
-**ALTEA** is a comprehensive, full-stack construction site management platform built with modern web technologies. It provides end-to-end solutions for managing construction sites, employees, materials, payments, and real-time monitoring through an intuitive dashboard and RESTful API.
+**project** is a comprehensive, full-stack construction site management platform built with modern web technologies. It provides end-to-end solutions for managing construction sites, employees, materials, payments, and real-time monitoring through an intuitive dashboard and RESTful API.
 
 The system consists of:
 - **Frontend**: Angular 21 standalone application with real-time updates
@@ -37,7 +37,7 @@ The system consists of:
 
 ## 🎯 Project Goal
 
-The primary goal of ALTEA is to **streamline construction site operations** by providing:
+The primary goal of project is to **streamline construction site operations** by providing:
 
 1. **Centralized Management**: Single platform for all site-related data and operations
 2. **Real-time Monitoring**: Live updates on site activities, employee attendance, and material usage
@@ -329,8 +329,8 @@ export const environment = {
 
 1. Open browser: `http://localhost:4200`
 2. Default credentials (if seeded):
-   - **Email**: `admin@altea.com`
-   - **Password**: `admin123`
+   - **Email**: `duki@example.com`
+   - **Password**: `Duki23052001`
 
 ---
 
