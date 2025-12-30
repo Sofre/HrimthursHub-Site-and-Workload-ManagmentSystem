@@ -1,4 +1,4 @@
-# 🏗️ HrimthursHub : Site and Workload Management System
+# 🏗️ HrimthursHub : Site and Workload Management System V1.0
 
 Altea is name of company for whom project is dedicated to long run 
 
@@ -94,6 +94,8 @@ The primary goal of project is to **streamline construction site operations** by
 - Real-time attendance updates
 - Material stock alerts
 
+  ## Note to be done in future some of the features 
+
 ---
 
 ## 🛠️ Technology Stack
@@ -108,7 +110,7 @@ The primary goal of project is to **streamline construction site operations** by
 - **Authentication**: JWT with @auth0/angular-jwt
 - **Build**: Angular CLI v21 with esbuild
 
-### Backend (NestJS)
+### Backend (NestJS) HEAVY NOTE : NOT ALL IMPLEMENTED 
 - **Framework**: NestJS v11 (TypeScript)
 - **Database ORM**: Prisma v5.19.1
 - **Database**: PostgreSQL
@@ -120,7 +122,7 @@ The primary goal of project is to **streamline construction site operations** by
 - **Notifications**: Firebase Admin SDK
 - **Validation**: class-validator + class-transformer
 
-### Infrastructure
+### Infrastructure TO BE DONE IN FUTURE
 - **Cache**: Redis (cache-manager-redis-yet)
 - **Database**: PostgreSQL with connection pooling
 - **Real-time**: Socket.IO for WebSocket connections
