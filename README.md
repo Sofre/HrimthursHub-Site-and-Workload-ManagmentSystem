@@ -277,7 +277,7 @@ cp .env.example .env
 # Run database migrations
 npx prisma migrate dev
 
-# Seed the database (optional)
+# Seed the database MUST SEED DATA 
 npx prisma db seed
 
 # Start development server
