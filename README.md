@@ -271,7 +271,7 @@ cd site-management-backend
 npm install
 
 # Configure environment variables
-cp .env.example .env
+cp .env.example.env  OR  cp .env.env   ( Try both in my instance .env.example but change in both is better )
 # Edit .env with your database credentials, JWT secret, API keys
 
 # Run database migrations
@@ -284,7 +284,7 @@ npx prisma db seed
 npm run start:dev
 ```
 
-**Backend runs on**: `http://localhost:3000`
+**Backend runs on**: `http://localhost:3001`
 
 #### Environment Variables (.env)
 
