@@ -289,13 +289,67 @@ npm run start:dev
 #### Environment Variables (.env)
 
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/altea_db"
-JWT_SECRET="your-super-secret-jwt-key"
-JWT_EXPIRATION="7d"
-GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
-REDIS_HOST="localhost"
+# Site Management Backend Environment Configuration
+
+# Database
+DATABASE_URL="postgresql://postgres:23052001@localhost:5432/wfs"
+
+# Redis Configuration
+REDIS_HOST=localhost
 REDIS_PORT=6379
-FIREBASE_PROJECT_ID="your-firebase-project"
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# Google Maps API
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+
+# Firebase Configuration
+FIREBASE_PROJECT_ID=site-management-construction
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xyz@site-management-construction.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\n-----END PRIVATE KEY-----\n"
+
+# Frontend URL for CORS
+FRONTEND_URL=http://localhost:3000
+
+# Application Configuration
+NODE_ENV=development
+PORT=3001
+
+# Security
+JWT_SECRET=your_jwt_secret_key_change_this_in_production
+JWT_EXPIRES_IN=24h
+
+# Email Configuration (Optional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_email_password
+
+# Logging
+LOG_LEVEL=info
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Check-in Validation
+MAX_CHECKIN_DISTANCE_METERS=100
+
+# Notification Settings
+DEFAULT_NOTIFICATION_TTL=86400
+BATCH_NOTIFICATION_SIZE=1000
+
+# Cache TTL Settings (in seconds)
+CACHE_TTL_EMPLOYEE_PROFILE=3600
+CACHE_TTL_SITE_COST=1800
+CACHE_TTL_ACTIVE_EMPLOYEES=300
+CACHE_TTL_SEARCH_RESULTS=600
+CACHE_TTL_DASHBOARD_STATS=300
+
+# Background Job Settings
+ENABLE_SCHEDULED_JOBS=true
+CLEANUP_RETENTION_DAYS=30
+
 ```
 
 ### 3. Frontend Setup
@@ -314,19 +368,6 @@ ng serve
 
 **Frontend runs on**: `http://localhost:4200`
 
-#### Frontend Environment Configuration
-
-Edit `src/environments/environment.ts`:
-
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:3000',
-  wsUrl: 'ws://localhost:3000',
-  googleMapsApiKey: 'your-google-maps-api-key'
-};
-```
-
 ### 4. Access the Application
 
 1. Open browser: `http://localhost:4200`
@@ -335,6 +376,8 @@ export const environment = {
    - **Password**: `Duki23052001`
 
 ---
+
+## ⚠️ Data is SEEDED 
 
 ## ⚠️ Important Notes
 
